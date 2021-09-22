@@ -133,7 +133,7 @@
             <UseExternalTool>0</UseExternalTool>
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
-            <Capability>1</Capability>
+            <Capability>0</Capability>
             <DriverSelection>4101</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>USE_FULL_LL_DRIVER,USE_HAL_DRIVER,STM32L083xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32L0xx_HAL_Driver/Inc;../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32L0xx/Include;../Drivers/CMSIS/Include;..\lwip-2.1.2\src\api;..\lwip-2.1.2\src\apps\http;..\lwip-2.1.2\src\apps\mdns;..\lwip-2.1.2\src\apps\mqtt;..\lwip-2.1.2\src\apps\sntp;..\lwip-2.1.2\src\include;..\lwip-2.1.2\src\include\lwip;..\lwip-2.1.2\src\include\lwip\apps;..\lwip-2.1.2\src\include\lwip\priv;..\lwip-2.1.2\src\include\lwip\prot;..\lwip-2.1.2\src\include\netif;..\lwip-2.1.2\src\netif\ppp;..\lwip-2.1.2\src\include\netif\ppp\polarssl;..\platform_stm32;..\platform_stm32\SEGGER_RTT_V698b\RTT;..\platform_stm32\app_debug</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32L0xx_HAL_Driver/Inc;../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32L0xx/Include;../Drivers/CMSIS/Include;..\lwip-2.1.2\src\api;..\lwip-2.1.2\src\apps\http;..\lwip-2.1.2\src\apps\mdns;..\lwip-2.1.2\src\apps\mqtt;..\lwip-2.1.2\src\apps\sntp;..\lwip-2.1.2\src\include;..\lwip-2.1.2\src\include\lwip;..\lwip-2.1.2\src\include\lwip\apps;..\lwip-2.1.2\src\include\lwip\priv;..\lwip-2.1.2\src\include\lwip\prot;..\lwip-2.1.2\src\include\netif;..\lwip-2.1.2\src\netif\ppp;..\lwip-2.1.2\src\include\netif\ppp\polarssl;..\platform_stm32;..\platform_stm32\SEGGER_RTT_V698b\RTT;..\platform_stm32\app_debug;..\gsm;..\sys_ctx</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -892,6 +892,36 @@
               <FileName>SEGGER_RTT_printf.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\platform_stm32\SEGGER_RTT_V698b\RTT\SEGGER_RTT_printf.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>gsm</GroupName>
+          <Files>
+            <File>
+              <FileName>gsm.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\gsm\gsm.h</FilePath>
+            </File>
+            <File>
+              <FileName>gsm_data_layer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gsm\gsm_data_layer.c</FilePath>
+            </File>
+            <File>
+              <FileName>gsm_hardware_layer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gsm\gsm_hardware_layer.c</FilePath>
+            </File>
+            <File>
+              <FileName>gsm_utilities.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gsm\gsm_utilities.c</FilePath>
+            </File>
+            <File>
+              <FileName>gsm_utilities.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\gsm\gsm_utilities.h</FilePath>
             </File>
           </Files>
         </Group>

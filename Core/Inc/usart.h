@@ -28,16 +28,20 @@ extern "C" {
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-
+#include <stdbool.h>
 /* USER CODE END Includes */
 
 /* USER CODE BEGIN Private defines */
-
+#define GSM_UART_CONTROL(enable)            usart1_control(enable)
 /* USER CODE END Private defines */
 
 void MX_USART1_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
+/**
+ * @brief           Enable/disable USART1 peripheral
+ */
+void usart1_control(bool enable);
 
 /* USER CODE END Prototypes */
 

@@ -13,7 +13,7 @@
 #define DEBUG_LEVEL             DEBUG_LEVEL_VERBOSE  
 
 #include "SEGGER_RTT.h"
-#if 1
+#if 1       // RTT color
 #define KNRM  "\x1B[0m"
 #define KRED  RTT_CTRL_TEXT_RED
 #define KGRN  RTT_CTRL_TEXT_GREEN
@@ -22,7 +22,7 @@
 #define KMAG  RTT_CTRL_TEXT_MAGENTA
 #define KCYN  RTT_CTRL_TEXT_CYAN
 #define KWHT  RTT_CTRL_TEXT_WHITE
-#else
+#else   // Teraterm
 #define KNRM  "\x1B[0m"
 #define KRED  "\x1B[31m"
 #define KGRN  "\x1B[32m"
@@ -33,32 +33,31 @@
 #define KWHT  "\x1B[37m"
 #endif
 
-#define DEBUG_RTT               1
 #define DEBUG_RAW               app_debug_rtt_raw
 
 
 #define DEBUG_DUMP                           app_debug_dump
 
 #if (DEBUG_LEVEL_VERBOSE > DEBUG_LEVEL)
-#define DEBUG_VERBOSE(s, args...)               app_debug_rtt_raw(KMAG "<%u> [I] %s : " s KNRM,  sys_get_ms(), "", ##args)
+#define DEBUG_VERBOSE(s, args...)               app_debug_rtt_raw(KMAG "<%u> [I] %s : " s KNRM,  sys_get_tick_ms(), "", ##args)
 #else
 #define DEBUG_VERBOSE(s, args...)               app_debug_rtt_nothing(s, ##args)
 #endif
 
 #if (DEBUG_LEVEL_INFO > DEBUG_LEVEL)
-#define DEBUG_INFO(s, args...)                  app_debug_rtt_raw(KGRN "<%u> [I] %s : " s KNRM,  sys_get_ms(), "", ##args)
+#define DEBUG_INFO(s, args...)                  app_debug_rtt_raw(KGRN "<%u> [I] %s : " s KNRM,  sys_get_tick_ms(), "", ##args)
 #else
 #define DEBUG_INFO(s, args...)                  app_debug_rtt_nothing(s, ##args)
 #endif
 
 #if (DEBUG_LEVEL_ERROR > DEBUG_LEVEL)
-#define DEBUG_ERROR(s, args...)                 app_debug_rtt_raw(KRED "<%u> [E] %s : " s KNRM,  sys_get_ms(), "", ##args)
+#define DEBUG_ERROR(s, args...)                 app_debug_rtt_raw(KRED "<%u> [E] %s : " s KNRM,  sys_get_tick_ms(), "", ##args)
 #else
 #define DEBUG_ERROR(s, args...)                 app_debug_rtt_nothing(s, ##args)
 #endif
 
 #if (DEBUG_LEVEL_WARN > DEBUG_LEVEL)
-#define DEBUG_WARN(s, args...)                  app_debug_rtt_raw(KYEL "<%u> [W] %s : " s KNRM,  sys_get_ms(), "", ##args)
+#define DEBUG_WARN(s, args...)                  app_debug_rtt_raw(KYEL "<%u> [W] %s : " s KNRM,  sys_get_tick_ms(), "", ##args)
 #else
 #define DEBUG_WARN(s, args...)                  app_debug_rtt_nothing(s, ##args)
 #endif
@@ -77,7 +76,6 @@
 #define DEBUG_FLUSH()      while(0)
 #endif
 
-extern uint32_t sys_get_tick_ms(void);
 
 int32_t app_debug_rtt_nothing(const char *fmt,...);
 

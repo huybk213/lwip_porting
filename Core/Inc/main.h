@@ -80,6 +80,25 @@ void Error_Handler(void);
 #define GSM_PWR_EN_Pin LL_GPIO_PIN_15
 #define GSM_PWR_EN_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
+
+#define GSM_PWR_EN(x)			{	if (x) \
+										LL_GPIO_SetOutputPin(GSM_PWR_EN_GPIO_Port, GSM_PWR_EN_Pin);	\
+									else	\
+										LL_GPIO_ResetOutputPin(GSM_PWR_EN_GPIO_Port, GSM_PWR_EN_Pin);	\
+								}
+
+#define GSM_PWR_RESET(x)		{	if (x) \
+										LL_GPIO_SetOutputPin(GSM_RESET_GPIO_Port, GSM_RESET_Pin);	\
+									else	\
+										LL_GPIO_ResetOutputPin(GSM_RESET_GPIO_Port, GSM_RESET_Pin);	\
+								}
+
+#define GSM_PWR_KEY(x)			{	if (x) \
+										LL_GPIO_SetOutputPin(GSM_PWR_KEY_GPIO_Port, GSM_PWR_KEY_Pin);	\
+									else	\
+										LL_GPIO_ResetOutputPin(GSM_PWR_KEY_GPIO_Port, GSM_PWR_KEY_Pin);	\
+								}	
+
 /**
  * @brief           Get systick in milis
  */

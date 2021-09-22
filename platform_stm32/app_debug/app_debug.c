@@ -15,7 +15,7 @@ int32_t app_debug_rtt_nothing(const char *fmt,...)
     return -1;
 }
 
-int app_debug_rtt(const char *fmt,...)
+int32_t app_debug_rtt(const char *fmt,...)
 {
     int32_t     n;
 

@@ -84,6 +84,9 @@ typedef int32_t sys_prot_t;
 #define LWIP_PLATFORM_ASSERT(x) do {DEBUG_RAW("Assertion \"%s\" failed at line %d in %s\r\n", \
                                      x, __LINE__, __FILE__); } while(0)
 
+#define LWIP_PLATFORM_DIAG(x) do {DEBUG_RAW x;} while(0)
+
+
 #endif /* LWIP_PLATFORM_ASSERT */
 /* Define random number generator function */
 #define LWIP_RAND() ((u32_t)rand())
