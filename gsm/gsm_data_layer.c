@@ -11,6 +11,7 @@
 #include "lwip/init.h"
 #include "dns.h"
 #include "sio.h"
+#include "sntp.h"
 
 #define UNLOCK_BAND 0
 #define CUSD_ENABLE 0
@@ -612,6 +613,19 @@ void *gsm_data_layer_get_ppp_control_block(void)
     return m_ppp_control_block;
 }
 
+static void initialize_stnp(void)
+{
+    static bool sntp_start = false;
+    if (sntp_start == false)
+    {
+        sntp_start = true;
+        DEBUG_INFO("Initialize stnp\r\n");
+        sntp_setoperatingmode(SNTP_OPMODE_POLL);
+        sntp_setservername(0, "pool.ntp.org");
+        sntp_init();
+    }
+}
+
 /**
  * PPP status callback
  * ===================
@@ -635,15 +649,15 @@ static void ppp_link_status_cb(ppp_pcb *pcb, int err_code, void *ctx)
 
 #if PPP_IPV4_SUPPORT
 
-        DEBUG_INFO("our_ipaddr  = %s\r\n", ipaddr_ntoa(&pppif->ip_addr));
-        DEBUG_INFO("his_ipaddr  = %s\r\n", ipaddr_ntoa(&pppif->gw));
-        DEBUG_INFO("netmask    = %s\r\n", ipaddr_ntoa(&pppif->netmask));
+        DEBUG_INFO("\tour_ipaddr    = %s\r\n", ipaddr_ntoa(&pppif->ip_addr));
+        DEBUG_INFO("\this_ipaddr    = %s\r\n", ipaddr_ntoa(&pppif->gw));
+        DEBUG_INFO("\tnetmask       = %s\r\n", ipaddr_ntoa(&pppif->netmask));
 
 #if LWIP_DNS
         ns = dns_getserver(0);
-        DEBUG_INFO("\tdns1        = %s\r\n", ipaddr_ntoa(ns));
+        DEBUG_INFO("\tdns1          = %s\r\n", ipaddr_ntoa(ns));
         ns = dns_getserver(1);
-        DEBUG_INFO("\tdns2        = %s\r\n", ipaddr_ntoa(ns));
+        DEBUG_INFO("\tdns2          = %s\r\n", ipaddr_ntoa(ns));
 #endif /* LWIP_DNS */
 
 #endif /* PPP_IPV4_SUPPORT */
@@ -735,6 +749,7 @@ static void ppp_link_status_cb(ppp_pcb *pcb, int err_code, void *ctx)
     if (err_code == PPPERR_NONE)
     {
         DEBUG_INFO("PPP is opened OK\r\n!");
+        initialize_stnp();
         return;
     }
 
@@ -760,8 +775,7 @@ static uint32_t ppp_output_callback(ppp_pcb *pcb, u8_t *data, u32_t len, void *c
     for (uint32_t i = 0; i < len; i++)
     {
         LL_USART_TransmitData8(USART1, data[i]);
-        while (0 == LL_USART_IsActiveFlag_TC(USART1))
-            ;
+        while (0 == LL_USART_IsActiveFlag_TC(USART1));
     }
     return len;
 }
@@ -817,25 +831,43 @@ static void ppp_notify_phase_cb(ppp_pcb *pcb, u8_t phase, void *ctx)
     }
 }
 
+void lwip_sntp_recv_callback(uint32_t time)
+{
+    if (time == 0)
+    {
+        DEBUG_WARN("NTP: Error, server not responding or bad response\r\n");
+    }
+    else
+    {
+        DEBUG_INFO("NTP: %u seconds elapsed since 1.1.1970\r\n", time);
+    }
+}
+
 uint32_t sio_read(sio_fd_t fd, u8_t *data, u32_t len)
 {
     return gsm_hardware_layer_copy_ppp_buffer(data, len);
 }
 
-static uint8_t m_ppp_rx_buffer[GSM_PPP_MODEM_BUFFER_SIZE];
+static uint8_t m_ppp_rx_buffer[512];
 void gsm_hw_pppos_polling(void)
 {
     uint32_t sio_size;
 
     sys_check_timeouts();
 
-    sio_size = sio_read(0, m_ppp_rx_buffer, GSM_PPP_MODEM_BUFFER_SIZE);
+    sio_size = sio_read(0, m_ppp_rx_buffer, 512);
     if (sio_size > 0)
     {
         // Bypass data into ppp stack
         pppos_input(gsm_data_layer_get_ppp_control_block(), m_ppp_rx_buffer, sio_size);
     }
 }
+
+bool gsm_is_in_ppp_mode(void)
+{
+    return m_gsm_manager.mode == GSM_INTERNET_MODE_PPP_STACK ? true : false;
+}
+
 
 void gsm_mnr_task(void *arg)
 {

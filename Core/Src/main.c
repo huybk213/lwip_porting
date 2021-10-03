@@ -175,6 +175,11 @@ static void dns_initialize(void)
     dns_init();
 }
 
+uint32_t sys_rand()
+{
+    return SysTick->VAL;
+}
+
 /* USER CODE END 4 */
 
 /**

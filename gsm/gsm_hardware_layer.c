@@ -250,8 +250,7 @@ void gsm_hw_layer_uart_fill_rx(uint8_t *data, uint32_t length)
 	{			
 		m_new_uart_data = true;
         // Device do not enter AT mode =>> bypass data into PPP stack
-        if (m_gsm_atc.atc.retry_count_atc == 0
-            && m_gsm_atc.atc.current_timeout_atc_ms == 0)
+        if (gsm_is_in_ppp_mode())
         {
             for (uint32_t i = 0; i < length; i++)
             {

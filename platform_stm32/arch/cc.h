@@ -89,6 +89,7 @@ typedef int32_t sys_prot_t;
 
 #endif /* LWIP_PLATFORM_ASSERT */
 /* Define random number generator function */
-#define LWIP_RAND() ((u32_t)rand())
+extern uint32_t sys_rand(void);
+#define LWIP_RAND() ((u32_t)sys_rand())
 
 #endif /* __CC_H__ */

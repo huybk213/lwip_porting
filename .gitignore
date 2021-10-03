@@ -13,3 +13,7 @@ MDK-ARM/LWIP/LWIP.lnp
 *.txt
 *.huytv
 *.lst
+MDK-ARM/Output/LWIP External
+*.jlink
+*.huybk
+*.emProject

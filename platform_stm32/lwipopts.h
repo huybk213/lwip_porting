@@ -36,11 +36,11 @@
 
 #define NO_SYS                      1
 #define NO_SYS_NO_TIMERS            0
-#define MEM_LIBC_MALLOC             1
-#define MEMP_MEM_MALLOC             1
+//#define MEM_LIBC_MALLOC             1
+//#define MEMP_MEM_MALLOC             1
 #define MEM_ALIGNMENT               4
-#define MEM_SIZE                    0
-#define PBUF_POOL_SIZE              32
+#define MEM_SIZE                    (1024)
+#define PBUF_POOL_SIZE              6
 #define LWIP_ARP                    0
 #define IP_REASS_MAX_PBUFS          0
 #define IP_FRAG_USES_STATIC_BUF     0
@@ -48,7 +48,7 @@
 #define MEMP_NUM_UDP_PCB            2
 #define MEMP_NUM_TCP_PCB            1
 #define MEMP_NUM_TCP_PCB_LISTEN     1
-#define MEMP_NUM_TCP_SEG            0
+#define MEMP_NUM_TCP_SEG            8
 #define MEMP_NUM_FRAG_PBUF          0
 #define MEMP_NUM_TCPIP_MSG_API      0
 #define MEMP_NUM_TCPIP_MSG_INPKT    0
@@ -63,7 +63,7 @@
 #define LWIP_BROADCAST_PING         0
 #define LWIP_MULTICAST_PING         0
 #define LWIP_RAW                    0
-#define TCP_LISTEN_BACKLOG          1
+#define TCP_LISTEN_BACKLOG          0
 #define LWIP_NETIF_STATUS_CALLBACK  1
 #define LWIP_NETIF_LINK_CALLBACK    1
 #define LWIP_NETIF_HWADDRHINT       1
@@ -98,7 +98,7 @@
 #define LWIP_IPV6_REASS             0
 #define LWIP_ND6_TCP_REACHABILITY_HINTS 0
 #define LWIP_IPV6_MLD               0
-#define LWIP_STATS                  1
+#define LWIP_STATS                  0
 #define PPP_IPV6_SUPPORT            0
 #define LWIP_PPP_API                0
 #define PPP_SUPPORT                 1
@@ -112,17 +112,19 @@
 #define TCP_KEEPIDLE_DEFAULT        10000UL // Default KEEPALIVE timer in milliseconds
 #define TCP_KEEPINTVL_DEFAULT       2000UL  // Default Time between KEEPALIVE probes in milliseconds
 #define TCP_KEEPCNT_DEFAULT         9U      // Default Counter for KEEPALIVE probes
-#define TCP_MSS                     896
-#define TCP_WND                     (4 * TCP_MSS)
-#define TCP_SND_BUF                 (4 * TCP_MSS)
-#define DNS_TABLE_SIZE              1
+#define TCP_MSS                     536
+#define TCP_WND                     (2 * TCP_MSS)
+#define TCP_SND_BUF                 (2 * TCP_MSS)
+#define DNS_TABLE_SIZE              2
 #define DNS_MAX_NAME_LENGTH         128
 #define SO_REUSE                    1
-#define LWIP_NOASSERT               1
+//#define LWIP_NOASSERT               1
 //#define mem_init(...)
 //#define mem_free(p)                 nrf_free((p))
 //#define mem_malloc(sz)              nrf_malloc((sz))
 //#define mem_trim(p,sz)              nrf_realloc((p),(sz))
+
+#define SNTP_SERVER_DNS             1
 
 #define LWIP_DEBUG                  LWIP_DBG_OFF
 
@@ -160,5 +162,8 @@
 
 
 #define HTTPC_CLIENT_AGENT          "huytv"
+
+extern void lwip_sntp_recv_callback(uint32_t sec);
+#define SNTP_SET_SYSTEM_TIME        lwip_sntp_recv_callback
 
 #endif /* __LWIPOPTS_H__ */

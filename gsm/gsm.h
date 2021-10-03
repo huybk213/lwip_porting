@@ -68,8 +68,8 @@ typedef enum
 
 typedef enum
 {
+    GSM_INTERNET_MODE_AT_STACK,
     GSM_INTERNET_MODE_PPP_STACK,
-    GSM_INTERNET_MODE_AT_STACK
 } gsm_internet_mode_t;
 
 typedef struct
@@ -245,6 +245,13 @@ void gsm_mnr_task(void *arg);
  * @retval      Number of byte availble
  */
 uint32_t gsm_hardware_layer_copy_ppp_buffer(uint8_t *data, uint32_t len);
+
+/*!
+ * @brief		Check gsm is in data mode or cmd mode
+ * @retval      TRUE : PPP mode
+ *              FALSE : Command mode
+ */
+bool gsm_is_in_ppp_mode(void);
 
 /**
  * \}
