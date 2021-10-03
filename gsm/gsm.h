@@ -17,14 +17,21 @@
 #define SIMIMEI 1
 
 
-#define MODEM_BUFFER_SIZE 1024          // PPP buffer size
-#define GSM_ATC_BUFFER_SIZE (512)       // AT command buffer size
+#define GSM_ATC_BUFFER_SIZE             (256)   // AT command buffer size
+#define GSM_PPP_MODEM_BUFFER_SIZE       1024    // PPP buffer size
 
 typedef struct
 {
     uint8_t buffer[GSM_ATC_BUFFER_SIZE];
     uint16_t index;
 } gsm_atc_buffer_t;
+
+typedef struct
+{
+    uint16_t idx_in;
+    uint16_t idx_out;
+    uint8_t buffer[GSM_PPP_MODEM_BUFFER_SIZE];
+} gsm_modem_buffer_t;
 
 typedef enum
 {
@@ -52,11 +59,11 @@ typedef enum
     GSM_STATE_FILE_READ,
 } gsm_state_t;
 
-typedef enum
-{
-    GSM_AT_MODE = 1,
-    GSM_PPP_MODE
-} gsm_at_mode_t;
+//typedef enum
+//{
+//    GSM_AT_MODE = 1,
+//    GSM_PPP_MODE
+//} gsm_at_mode_t;
 
 
 typedef enum
@@ -70,6 +77,8 @@ typedef struct
     gsm_state_t state;
     uint8_t step;
     uint8_t gsm_ready;
+    gsm_internet_mode_t mode;
+    uint8_t ppp_phase; // @ref lwip ppp.h
 } gsm_manager_t;
 
 typedef void (*gsm_send_at_cb_t)(gsm_response_event_t event, void *response_buffer);
@@ -229,6 +238,13 @@ void gsm_hw_layer_reset_rx_buffer(void);
  */
 void gsm_mnr_task(void *arg);
 
+/*!
+ * @brief		Copy data from serial RX to ppp buffer
+ * @param[in]	data Buffer hold data
+ * @param[in]   len Number of bytes to read
+ * @retval      Number of byte availble
+ */
+uint32_t gsm_hardware_layer_copy_ppp_buffer(uint8_t *data, uint32_t len);
 
 /**
  * \}

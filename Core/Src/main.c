@@ -25,7 +25,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "init.h"
+#include "ppp.h"
+#include "dns.h"
+#include "app_debug.h"
+#include "gsm.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,7 +60,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+static void dns_initialize(void);
 /* USER CODE END 0 */
 
 /**
@@ -90,7 +94,10 @@ int main(void)
   MX_DMA_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-
+    dns_initialize();
+    lwip_init();
+    DEBUG_INFO("Application started\r\n");
+    gsm_init_hw();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -100,6 +107,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    gsm_mnr_task(NULL);
   }
   /* USER CODE END 3 */
 }
@@ -157,6 +165,16 @@ uint32_t sys_get_tick_ms(void)
 {
     return HAL_GetTick();
 }
+
+static void dns_initialize(void)
+{
+    ip_addr_t dns_server_0 = IPADDR4_INIT_BYTES(8, 8, 8, 8);
+    ip_addr_t dns_server_1 = IPADDR4_INIT_BYTES(1, 1, 1, 1);
+    dns_setserver(0, &dns_server_0);
+    dns_setserver(1, &dns_server_1);
+    dns_init();
+}
+
 /* USER CODE END 4 */
 
 /**

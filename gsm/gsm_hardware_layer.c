@@ -15,6 +15,11 @@
 #include "app_debug.h"
 #include "usart.h"
 
+
+// Buffer for ppp
+static gsm_modem_buffer_t m_gsm_modem_buffer;
+
+// Buffer for AT command
 static gsm_hardware_atc_t m_gsm_atc;
 
 static volatile bool m_new_uart_data = false;
@@ -67,7 +72,7 @@ void gsm_uart_handler(void)
 }
 
 
-uint32_t m_poll_interval;
+uint32_t m_poll_interval = 5;
 uint32_t current_response_length;
 uint32_t expect_compare_length;
 uint8_t *p_compare_end_str;
@@ -84,7 +89,8 @@ void gsm_hw_layer_run(void)
     
     m_last_poll = now;
     bool ret_now = true;
-
+    
+    // If device is in AT mode
     if (m_gsm_atc.atc.retry_count_atc)
     {
         __disable_irq();
@@ -181,26 +187,9 @@ void gsm_hw_layer_run(void)
         }
         else
         {
-//            DEBUG_VERBOSE("Resend ATC: %sExpect %s\r\n", m_gsm_atc.atc.cmd, m_gsm_atc.atc.expect_resp_from_atc);
+            DEBUG_INFO("Resend ATC: %sExpect %s\r\n", m_gsm_atc.atc.cmd, m_gsm_atc.atc.expect_resp_from_atc);
             m_gsm_atc.atc.current_timeout_atc_ms = sys_get_tick_ms();
             gsm_hw_uart_send_raw((uint8_t*)m_gsm_atc.atc.cmd, strlen(m_gsm_atc.atc.cmd));
-        }
-    }
-
-//    if (m_gsm_atc.atc.recv_buff.index > 32 
-//        && strstr((char*)m_gsm_atc.atc.recv_buff.buffer+10, "CUSD:"))
-//        {
-//            DEBUG_VERBOSE("CUSD %s\r\n", m_gsm_atc.atc.recv_buff.buffer);
-//        }
-
-    if (m_gsm_atc.atc.retry_count_atc == 0)
-    {
-        if (m_gsm_atc.atc.recv_buff.index > 2 
-            && strstr((char*)m_gsm_atc.atc.recv_buff.buffer+10, "\r\n"))
-        {
-            DEBUG_WARN("ATC : unhandled %s\r\n", m_gsm_atc.atc.recv_buff.buffer);
-            m_gsm_atc.atc.recv_buff.index = 0;
-            m_gsm_atc.atc.recv_buff.buffer[m_gsm_atc.atc.recv_buff.index] = 0;
         }
     }
 
@@ -230,10 +219,10 @@ void gsm_hw_send_at_cmd(char *cmd, char *expect_resp,
     }
     
 
-//    if (strlen(cmd) < 64)
-//    {
-//        DEBUG_INFO("ATC: %s", cmd);
-//    }
+    if (strlen(cmd) < 64)
+    {
+        DEBUG_INFO("ATC: %s", cmd);
+    }
 
     m_gsm_atc.atc.cmd = cmd;
     m_gsm_atc.atc.expect_resp_from_atc = expect_resp;
@@ -260,22 +249,59 @@ void gsm_hw_layer_uart_fill_rx(uint8_t *data, uint32_t length)
 	if (length)
 	{			
 		m_new_uart_data = true;
-        prev_index = m_gsm_atc.atc.recv_buff.index;
-		for (uint32_t i = 0; i < length; i++)
-		{
-			m_gsm_atc.atc.recv_buff.buffer[m_gsm_atc.atc.recv_buff.index++] = data[i];
-			if (m_gsm_atc.atc.recv_buff.index >= sizeof(((gsm_atc_buffer_t*)0)->buffer))
-			{
-				DEBUG_ERROR("GSM RX overflow\r\n");
-				m_gsm_atc.atc.recv_buff.index = 0;
-                m_gsm_atc.atc.recv_buff.buffer[0] = 0;
-				return;
-			}
-		}
+        // Device do not enter AT mode =>> bypass data into PPP stack
+        if (m_gsm_atc.atc.retry_count_atc == 0
+            && m_gsm_atc.atc.current_timeout_atc_ms == 0)
+        {
+            for (uint32_t i = 0; i < length; i++)
+            {
+                m_gsm_modem_buffer.buffer[m_gsm_modem_buffer.idx_in++] = data[i];
+                if (m_gsm_modem_buffer.idx_in >= GSM_PPP_MODEM_BUFFER_SIZE)
+                {
+                    m_gsm_modem_buffer.idx_in = 0;
+                    DEBUG_ERROR("GSM PPP RX overflow\r\n");
+                }
+                m_gsm_modem_buffer.buffer[m_gsm_modem_buffer.idx_in] = 0;
+            }
+        }
+        else
+        {
+            prev_index = m_gsm_atc.atc.recv_buff.index;
+            for (uint32_t i = 0; i < length; i++)
+            {
+                m_gsm_atc.atc.recv_buff.buffer[m_gsm_atc.atc.recv_buff.index++] = data[i];
+                if (m_gsm_atc.atc.recv_buff.index >= sizeof(((gsm_atc_buffer_t*)0)->buffer))
+                {
+                    DEBUG_ERROR("GSM ATC RX overflow\r\n");
+                    m_gsm_atc.atc.recv_buff.index = 0;
+                    m_gsm_atc.atc.recv_buff.buffer[0] = 0;
+                    return;
+                }
+            }
+        }
 	}
 }
 
-char* gsm_get_sim_imei(void)
+uint32_t gsm_hardware_layer_copy_ppp_buffer(uint8_t *data, uint32_t len)
+{
+    uint32_t i = 0;
+    for (i = 0; i < len; i++)
+    {
+        if (m_gsm_modem_buffer.idx_out == m_gsm_modem_buffer.idx_in)
+        {
+            return i;       // No more memory
+        }
+
+        data[i] = m_gsm_modem_buffer.buffer[m_gsm_modem_buffer.idx_out];
+
+        m_gsm_modem_buffer.idx_out++;
+        if (m_gsm_modem_buffer.idx_out == GSM_PPP_MODEM_BUFFER_SIZE)
+            m_gsm_modem_buffer.idx_out = 0;
+    }
+    return i;
+}
+
+char *gsm_get_sim_imei(void)
 {
 	return m_sim_imei;
 }
@@ -285,7 +311,7 @@ char *gsm_get_sim_ccid(void)
 	return m_sim_ccid;
 }
 
-char* gsm_get_module_imei(void)
+char *gsm_get_module_imei(void)
 {
 	return m_gsm_imei;
 }

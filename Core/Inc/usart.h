@@ -43,6 +43,18 @@ void MX_USART1_UART_Init(void);
  */
 void usart1_control(bool enable);
 
+/**
+ * @brief       New uart RX callback
+ * @param[in]   enable TRUE - Data is valid
+                        FALSE - Error orcurs
+ */
+void usart1_rx_complete_callback(bool status);
+
+/**
+ * @brief       Start DMA RX
+ */
+void usart1_start_dma_rx(void);
+
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

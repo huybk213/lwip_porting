@@ -38,25 +38,25 @@
 
 #define DEBUG_DUMP                           app_debug_dump
 
-#if (DEBUG_LEVEL_VERBOSE > DEBUG_LEVEL)
+#if (DEBUG_LEVEL_VERBOSE >= DEBUG_LEVEL)
 #define DEBUG_VERBOSE(s, args...)               app_debug_rtt_raw(KMAG "<%u> [I] %s : " s KNRM,  sys_get_tick_ms(), "", ##args)
 #else
 #define DEBUG_VERBOSE(s, args...)               app_debug_rtt_nothing(s, ##args)
 #endif
 
-#if (DEBUG_LEVEL_INFO > DEBUG_LEVEL)
+#if (DEBUG_LEVEL_INFO >= DEBUG_LEVEL)
 #define DEBUG_INFO(s, args...)                  app_debug_rtt_raw(KGRN "<%u> [I] %s : " s KNRM,  sys_get_tick_ms(), "", ##args)
 #else
 #define DEBUG_INFO(s, args...)                  app_debug_rtt_nothing(s, ##args)
 #endif
 
-#if (DEBUG_LEVEL_ERROR > DEBUG_LEVEL)
+#if (DEBUG_LEVEL_ERROR >= DEBUG_LEVEL)
 #define DEBUG_ERROR(s, args...)                 app_debug_rtt_raw(KRED "<%u> [E] %s : " s KNRM,  sys_get_tick_ms(), "", ##args)
 #else
 #define DEBUG_ERROR(s, args...)                 app_debug_rtt_nothing(s, ##args)
 #endif
 
-#if (DEBUG_LEVEL_WARN > DEBUG_LEVEL)
+#if (DEBUG_LEVEL_WARN >= DEBUG_LEVEL)
 #define DEBUG_WARN(s, args...)                  app_debug_rtt_raw(KYEL "<%u> [W] %s : " s KNRM,  sys_get_tick_ms(), "", ##args)
 #else
 #define DEBUG_WARN(s, args...)                  app_debug_rtt_nothing(s, ##args)
