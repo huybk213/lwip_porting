@@ -30,6 +30,7 @@
 #include "dns.h"
 #include "app_debug.h"
 #include "gsm.h"
+#include "mqtt_client.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -98,6 +99,18 @@ int main(void)
     lwip_init();
     DEBUG_INFO("Application started\r\n");
     gsm_init_hw();
+    
+    /* Init mqtt parameter */
+    mqtt_client_cfg_t mqtt_cfg = 
+    {
+        .periodic_sub_req_s = 120,            // second
+        .broker_addr = "broker.hivemq.com",
+        .port = 1883,
+        .password = NULL,
+        .client_id = "test_lwip_porting",
+    };
+    mqtt_client_initialize(&mqtt_cfg);
+    
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -108,6 +121,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     gsm_mnr_task(NULL);
+    mqtt_client_polling_task(NULL);
   }
   /* USER CODE END 3 */
 }

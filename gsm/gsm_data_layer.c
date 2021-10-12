@@ -868,6 +868,10 @@ bool gsm_is_in_ppp_mode(void)
     return m_gsm_manager.mode == GSM_INTERNET_MODE_PPP_STACK ? true : false;
 }
 
+bool gsm_data_layer_is_ppp_connected(void)
+{
+    return m_ppp_connected;
+}
 
 void gsm_mnr_task(void *arg)
 {

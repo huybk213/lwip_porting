@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>USE_FULL_LL_DRIVER,USE_HAL_DRIVER,STM32L083xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32L0xx_HAL_Driver/Inc;../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32L0xx/Include;../Drivers/CMSIS/Include;..\lwip-2.1.2\src\api;..\lwip-2.1.2\src\apps\http;..\lwip-2.1.2\src\apps\mdns;..\lwip-2.1.2\src\apps\mqtt;..\lwip-2.1.2\src\apps\sntp;..\lwip-2.1.2\src\include;..\lwip-2.1.2\src\include\lwip;..\lwip-2.1.2\src\include\lwip\apps;..\lwip-2.1.2\src\include\lwip\priv;..\lwip-2.1.2\src\include\lwip\prot;..\lwip-2.1.2\src\include\netif;..\lwip-2.1.2\src\netif\ppp;..\lwip-2.1.2\src\include\netif\ppp\polarssl;..\platform_stm32;..\platform_stm32\SEGGER_RTT_V698b\RTT;..\platform_stm32\app_debug;..\gsm;..\sys_ctx;..\lwip-2.1.2\src\include\netif\ppp</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32L0xx_HAL_Driver/Inc;../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32L0xx/Include;../Drivers/CMSIS/Include;..\lwip-2.1.2\src\api;..\lwip-2.1.2\src\apps\http;..\lwip-2.1.2\src\apps\mdns;..\lwip-2.1.2\src\apps\mqtt;..\lwip-2.1.2\src\apps\sntp;..\lwip-2.1.2\src\include;..\lwip-2.1.2\src\include\lwip;..\lwip-2.1.2\src\include\lwip\apps;..\lwip-2.1.2\src\include\lwip\priv;..\lwip-2.1.2\src\include\lwip\prot;..\lwip-2.1.2\src\include\netif;..\lwip-2.1.2\src\netif\ppp;..\lwip-2.1.2\src\include\netif\ppp\polarssl;..\platform_stm32;..\platform_stm32\SEGGER_RTT_V698b\RTT;..\platform_stm32\app_debug;..\gsm;..\sys_ctx;..\lwip-2.1.2\src\include\netif\ppp;..\mqtt_client</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -922,6 +922,21 @@
               <FileName>gsm_utilities.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\gsm\gsm_utilities.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mqtt_client</GroupName>
+          <Files>
+            <File>
+              <FileName>mqtt_client.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\mqtt_client\mqtt_client.c</FilePath>
+            </File>
+            <File>
+              <FileName>mqtt_client.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\mqtt_client\mqtt_client.h</FilePath>
             </File>
           </Files>
         </Group>

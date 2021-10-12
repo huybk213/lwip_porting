@@ -17,3 +17,4 @@ MDK-ARM/Output/LWIP External
 *.jlink
 *.huybk
 *.emProject
+*.__i

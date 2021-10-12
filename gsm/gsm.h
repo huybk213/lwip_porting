@@ -253,6 +253,13 @@ uint32_t gsm_hardware_layer_copy_ppp_buffer(uint8_t *data, uint32_t len);
  */
 bool gsm_is_in_ppp_mode(void);
 
+/*!
+ * @brief		Get PPP connect status
+ * @retval      TRUE : PPP connected
+ *              FALSE : PPP not connected
+ */
+bool gsm_data_layer_is_ppp_connected(void);
+
 /**
  * \}
  */
