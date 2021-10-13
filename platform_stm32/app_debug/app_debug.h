@@ -76,6 +76,7 @@
 #define DEBUG_FLUSH()      while(0)
 #endif
 
+extern uint32_t sys_get_tick_ms(void);
 
 int32_t app_debug_rtt_nothing(const char *fmt,...);
 

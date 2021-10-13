@@ -31,6 +31,7 @@
 #include "app_debug.h"
 #include "gsm.h"
 #include "mqtt_client.h"
+#include "app_http.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -111,6 +112,9 @@ int main(void)
     };
     mqtt_client_initialize(&mqtt_cfg);
     
+    // Init http parameters
+    bool m_http_test_started = false;
+    
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -121,7 +125,21 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     gsm_mnr_task(NULL);
+#if 0
     mqtt_client_polling_task(NULL);
+#else
+    if (gsm_data_layer_is_ppp_connected() && m_http_test_started == false)
+    {
+        m_http_test_started = true;
+        // http://httpbin.org/get
+        app_http_config_t http_cfg;
+        sprintf(http_cfg.url, "%s", "httpbin.org");
+        http_cfg.port = 80;
+        sprintf(http_cfg.file, "%s", "/get");        
+        http_cfg.on_event_cb = (void*)0;
+        app_http_start(&http_cfg);
+    }
+#endif
   }
   /* USER CODE END 3 */
 }

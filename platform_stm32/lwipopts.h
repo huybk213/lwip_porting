@@ -45,8 +45,8 @@
 #define IP_REASS_MAX_PBUFS          0
 #define IP_FRAG_USES_STATIC_BUF     0
 #define MEMP_NUM_RAW_PCB            0
-#define MEMP_NUM_UDP_PCB            2
-#define MEMP_NUM_TCP_PCB            1
+#define MEMP_NUM_UDP_PCB            3
+#define MEMP_NUM_TCP_PCB            2
 #define MEMP_NUM_TCP_PCB_LISTEN     1
 #define MEMP_NUM_TCP_SEG            8
 #define MEMP_NUM_FRAG_PBUF          0
@@ -115,7 +115,7 @@
 #define TCP_MSS                     536
 #define TCP_WND                     (2 * TCP_MSS)
 #define TCP_SND_BUF                 (2 * TCP_MSS)
-#define DNS_TABLE_SIZE              2
+#define DNS_TABLE_SIZE              3
 #define DNS_MAX_NAME_LENGTH         128
 #define SO_REUSE                    1
 //#define LWIP_NOASSERT               1

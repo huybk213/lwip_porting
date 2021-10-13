@@ -13,7 +13,7 @@
 #include "sio.h"
 #include "sntp.h"
 
-#define UNLOCK_BAND 0
+#define UNLOCK_BAND 1
 #define CUSD_ENABLE 0
 
 static gsm_manager_t m_gsm_manager;
@@ -141,13 +141,13 @@ void do_unlock_band(gsm_response_event_t event, void *resp_buffer)
 
     case 1:
     {
-        gsm_hw_send_at_cmd("AT+QCFG=\"nwscanmode\",3,1\r\n", "OK\r\n", "", 1000, 10, do_unlock_band);
+        gsm_hw_send_at_cmd("AT+QCFG=\"nwscanmode\",3,1\r\n", "OK\r\n", "", 1000, 2, do_unlock_band);
     }
     break;
 
     case 2:
     {
-        gsm_hw_send_at_cmd("AT+QCFG=\"band\",00,45\r\n", "OK\r\n", "", 1000, 10, do_unlock_band);
+        gsm_hw_send_at_cmd("AT+QCFG=\"band\",00,45\r\n", "OK\r\n", "", 1000, 2, do_unlock_band);
     }
     break;
 
@@ -155,7 +155,7 @@ void do_unlock_band(gsm_response_event_t event, void *resp_buffer)
     {
         DEBUG_INFO("Unlock band: %s\r\n", (event == GSM_EVENT_OK) ? "[OK]" : "[FAIL]");
         m_unlock_band_step = 0;
-        gsm_hw_send_at_cmd("AT+CPIN?\r\n", "+CPIN: READY\r\n", "", 1000, 10, gsm_config_module);
+        gsm_hw_send_at_cmd("AT+CPIN?\r\n", "+CPIN: READY\r\n", "", 1000, 2, gsm_config_module);
         break;
     }
 
@@ -329,7 +329,7 @@ void gsm_config_module(gsm_response_event_t event, void *resp_buffer)
 
     case 18:
         DEBUG_INFO("Network registration status: %s, data %s\r\n", (event == GSM_EVENT_OK) ? "[OK]" : "[FAIL]", (char *)resp_buffer);
-        gsm_hw_send_at_cmd("AT+CGREG?\r\n", "OK\r\n", "", 1000, 5, gsm_config_module);
+        gsm_hw_send_at_cmd("AT+CGREG?\r\n", "OK\r\n", "", 1000, 2, gsm_config_module);
         break;
 
     case 19:
@@ -341,12 +341,12 @@ void gsm_config_module(gsm_response_event_t event, void *resp_buffer)
             retval = gsm_utilities_get_network_access_tech(resp_buffer, &access_tech);
             if (retval == false)
             {
-                gsm_hw_send_at_cmd("AT+CGREG?\r\n", "OK\r\n", "", 1000, 5, gsm_config_module);
+                gsm_hw_send_at_cmd("AT+CGREG?\r\n", "OK\r\n", "", 1000, 2, gsm_config_module);
                 gsm_change_hw_polling_interval(1000);
                 return;
             }
         }
-        gsm_hw_send_at_cmd("AT+COPS?\r\n", "OK\r\n", "", 2000, 5, gsm_config_module);
+        gsm_hw_send_at_cmd("AT+COPS?\r\n", "OK\r\n", "", 2000, 2, gsm_config_module);
         break;
 
     case 20:
@@ -359,20 +359,20 @@ void gsm_config_module(gsm_response_event_t event, void *resp_buffer)
                                                32);
             if (strlen(gsm_get_network_operator()) < 5)
             {
-                gsm_hw_send_at_cmd("AT+COPS?\r\n", "OK\r\n", "", 1000, 5, gsm_config_module);
+                gsm_hw_send_at_cmd("AT+COPS?\r\n", "OK\r\n", "", 1000, 3, gsm_config_module);
                 gsm_change_hw_polling_interval(1000);
                 return;
             }
             DEBUG_INFO("Network operator: %s\r\n", gsm_get_network_operator());
         }
         gsm_change_hw_polling_interval(5);
-        gsm_hw_send_at_cmd("AT\r\n", "OK\r\n", "", 1000, 5, gsm_config_module);
+        gsm_hw_send_at_cmd("AT\r\n", "OK\r\n", "", 1000, 3, gsm_config_module);
         break;
 
     case 21:
     {
         //        DEBUG_INFO("Select QSCLK: %s\r\n", (event == GSM_EVENT_OK) ? "[OK]" : "[FAIL]");
-        gsm_hw_send_at_cmd("AT+CCLK?\r\n", "+CCLK:", "OK\r\n", 1000, 5, gsm_config_module);
+        gsm_hw_send_at_cmd("AT+CCLK?\r\n", "+CCLK:", "OK\r\n", 1000, 53, gsm_config_module);
     }
     break;
 
@@ -383,7 +383,7 @@ void gsm_config_module(gsm_response_event_t event, void *resp_buffer)
                    (event == GSM_EVENT_OK) ? "[OK]" : "[FAIL]",
                    (char *)resp_buffer);
         // Get 4G signal strength
-        gsm_hw_send_at_cmd("AT+CSQ\r\n", "", "OK\r\n", 1000, 5, gsm_config_module);
+        gsm_hw_send_at_cmd("AT+CSQ\r\n", "", "OK\r\n", 1000, 2, gsm_config_module);
     }
     break;
 
@@ -405,7 +405,7 @@ void gsm_config_module(gsm_response_event_t event, void *resp_buffer)
         if (csq == 99) // Invalid CSQ =>> Polling CSQ again
         {
             m_gsm_manager.step = 21;
-            gsm_hw_send_at_cmd("AT+CSQ\r\n", "OK\r\n", "", 1000, 5, gsm_config_module);
+            gsm_hw_send_at_cmd("AT+CSQ\r\n", "OK\r\n", "", 1000, 3, gsm_config_module);
             gsm_change_hw_polling_interval(500);
         }
         else
@@ -619,10 +619,10 @@ static void initialize_stnp(void)
     if (sntp_start == false)
     {
         sntp_start = true;
-        DEBUG_INFO("Initialize stnp\r\n");
-        sntp_setoperatingmode(SNTP_OPMODE_POLL);
-        sntp_setservername(0, "pool.ntp.org");
-        sntp_init();
+//        DEBUG_INFO("Initialize stnp\r\n");
+//        sntp_setoperatingmode(SNTP_OPMODE_POLL);
+//        sntp_setservername(0, "pool.ntp.org");
+//        sntp_init();
     }
 }
 

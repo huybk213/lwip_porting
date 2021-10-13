@@ -270,6 +270,24 @@ http_wait_headers(struct pbuf *p, u32_t *content_length, u16_t *total_header_len
         }
       }
     }
+    else
+    {
+        content_len_hdr = pbuf_memfind(p, "Content-length: ", 16, 0);
+        if (content_len_hdr != 0xFFFF) {
+          u16_t content_len_line_end = pbuf_memfind(p, "\r\n", 2, content_len_hdr);
+          if (content_len_line_end != 0xFFFF) {
+            char content_len_num[16];
+            u16_t content_len_num_len = (u16_t)(content_len_line_end - content_len_hdr - 16);
+            memset(content_len_num, 0, sizeof(content_len_num));
+            if (pbuf_copy_partial(p, content_len_num, content_len_num_len, content_len_hdr + 16) == content_len_num_len) {
+              int len = atoi(content_len_num);
+              if ((len >= 0) && ((u32_t)len < HTTPC_CONTENT_LEN_INVALID)) {
+                *content_length = (u32_t)len;
+              }
+            }
+          }
+        }
+    }
     return ERR_OK;
   }
   return ERR_VAL;
@@ -336,6 +354,9 @@ httpc_tcp_recv(void *arg, struct altcp_pcb *pcb, struct pbuf *p, err_t r)
     }
   }
   if ((p != NULL) && (req->parse_state == HTTPC_PARSE_RX_DATA)) {
+    // HuyTV
+    req->timeout_ticks = HTTPC_POLL_TIMEOUT;
+    // end  
     req->rx_content_len += p->tot_len;
     if (req->recv_fn != NULL) {
       /* directly return here: the connection migth already be aborted from the callback! */

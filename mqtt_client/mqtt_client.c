@@ -180,7 +180,7 @@ static void mqtt_pub_request_cb(void *arg, err_t result)
 
 static void mqtt_client_send_heart_beat(void)
 {
-   snprintf(m_mqtt_tx_buffer, sizeof(m_mqtt_tx_buffer), "%s", "Xin chao cac ban\r\n");
+   snprintf(m_mqtt_tx_buffer, sizeof(m_mqtt_tx_buffer), "%s", "Xin chao cac ban");
 
     err_t err = mqtt_publish(&m_mqtt_static_client,
                              m_mqtt_publish_topic_name,
@@ -190,6 +190,7 @@ static void mqtt_client_send_heart_beat(void)
                              PUB_RETAIN,
                              mqtt_pub_request_cb,
                              NULL);
+    DEBUG_INFO("Publish data \"%s\" to topic %s\r\n", "Xin chao cac ban", m_mqtt_publish_topic_name);  
     if (err != ERR_OK)
     {
         DEBUG_INFO("Publish err: %d\r\n", err);
@@ -438,6 +439,6 @@ bool mqtt_client_is_connected_to_broker(void)
 void mqtt_client_initialize(mqtt_client_cfg_t *cfg)
 {
     memcpy(&m_cfg, cfg, sizeof(mqtt_client_cfg_t));
-    snprintf(m_mqtt_subscribe_topic_name, sizeof(m_mqtt_subscribe_topic_name), "%s", "test_pub_porting_lwip_stm32");
-    snprintf(m_mqtt_publish_topic_name, sizeof(m_mqtt_publish_topic_name), "%s", "test_sub_porting_lwip_stm32");
+    snprintf(m_mqtt_publish_topic_name, sizeof(m_mqtt_subscribe_topic_name), "%s", "test_pub_porting_lwip_stm32");
+    snprintf(m_mqtt_subscribe_topic_name, sizeof(m_mqtt_publish_topic_name), "%s", "test_sub_porting_lwip_stm32");
 }

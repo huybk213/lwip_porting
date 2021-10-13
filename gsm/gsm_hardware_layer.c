@@ -258,7 +258,6 @@ void gsm_hw_layer_uart_fill_rx(uint8_t *data, uint32_t length)
                 if (m_gsm_modem_buffer.idx_in >= GSM_PPP_MODEM_BUFFER_SIZE)
                 {
                     m_gsm_modem_buffer.idx_in = 0;
-                    DEBUG_ERROR("GSM PPP RX overflow\r\n");
                 }
                 m_gsm_modem_buffer.buffer[m_gsm_modem_buffer.idx_in] = 0;
             }
