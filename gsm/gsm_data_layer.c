@@ -372,7 +372,7 @@ void gsm_config_module(gsm_response_event_t event, void *resp_buffer)
     case 21:
     {
         //        DEBUG_INFO("Select QSCLK: %s\r\n", (event == GSM_EVENT_OK) ? "[OK]" : "[FAIL]");
-        gsm_hw_send_at_cmd("AT+CCLK?\r\n", "+CCLK:", "OK\r\n", 1000, 53, gsm_config_module);
+        gsm_hw_send_at_cmd("AT+CCLK?\r\n", "+CCLK:", "OK\r\n", 1000, 5, gsm_config_module);
     }
     break;
 

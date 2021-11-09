@@ -15,6 +15,7 @@
 static app_http_config_t m_http_cfg;
 static uint32_t m_total_bytes_recv = 0;
 static uint32_t m_content_length = 0;
+
 static httpc_connection_t m_conn_settings_try;
 static err_t httpc_file_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err);
 static httpc_state_t *m_http_connection_state;
