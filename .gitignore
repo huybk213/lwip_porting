@@ -18,3 +18,9 @@ MDK-ARM/Output/LWIP External
 *.huybk
 *.emProject
 *.__i
+port_stm32f4/lwip_porting/MDK-ARM/JLinkSettings.ini
+port_stm32f4/lwip_porting/MDK-ARM/RTE
+*.scvd
+*.lnp
+port_stm32f4/lwip_porting/MDK-ARM/lwip_porting/ExtDll.iex
+port_stm32f4/lwip_porting/MDK-ARM/lwip_porting/lwip_porting.hex

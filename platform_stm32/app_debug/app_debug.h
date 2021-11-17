@@ -10,7 +10,9 @@
 #define DEBUG_LEVEL_WARN        3
 #define DEBUG_LEVEL_ERROR       4
 
+#ifndef DEBUG_LEVEL
 #define DEBUG_LEVEL             DEBUG_LEVEL_VERBOSE  
+#endif
 
 #include "SEGGER_RTT.h"
 #if 1       // RTT color
@@ -33,10 +35,10 @@
 #define KWHT  "\x1B[37m"
 #endif
 
-#define DEBUG_RAW               app_debug_rtt_raw
+#define DEBUG_RAW                               app_debug_rtt_raw
 
 
-#define DEBUG_DUMP                           app_debug_dump
+#define DEBUG_DUMP                              app_debug_dump
 
 #if (DEBUG_LEVEL_VERBOSE >= DEBUG_LEVEL)
 #define DEBUG_VERBOSE(s, args...)               app_debug_rtt_raw(KMAG "<%u> [I] %s : " s KNRM,  sys_get_tick_ms(), "", ##args)
@@ -64,10 +66,10 @@
 
 
 
-#define DEBUG_COLOR(color, s, args...)       app_debug_rtt_raw(color s KNRM, ##args)
+#define DEBUG_COLOR(color, s, args...)          app_debug_rtt_raw(color s KNRM, ##args)
 
 
-#define DEBUG_PRINTF            app_debug_rtt
+#define DEBUG_PRINTF                            app_debug_rtt
 #ifndef DEBUG_PRINTF
 #define DEBUG_PRINTF(String...)	SEGGER_RTT_printf(0, String)
 #endif

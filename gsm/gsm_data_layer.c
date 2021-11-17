@@ -166,6 +166,7 @@ void do_unlock_band(gsm_response_event_t event, void *resp_buffer)
 }
 #endif /* UNLOCK_BAND */
 
+#ifndef MC60
 void gsm_config_module(gsm_response_event_t event, void *resp_buffer)
 {
     switch (m_gsm_manager.step)
@@ -449,6 +450,200 @@ void gsm_config_module(gsm_response_event_t event, void *resp_buffer)
 
     m_gsm_manager.step++;
 }
+#else
+void gsm_config_module(gsm_response_event_t event, void *resp_buffer)
+{
+    switch (m_gsm_manager.step)
+    {
+    case 1:
+        if (event != GSM_EVENT_OK)
+        {
+            DEBUG_ERROR("Connect modem ERR!\r\n");
+            gsm_change_state(GSM_STATE_RESET);
+        }
+        else
+        {
+            gsm_hw_send_at_cmd("ATE0\r\n", "OK\r\n", "", 1000, 10, gsm_config_module);
+        }
+        break;
+
+    case 2: /* Use AT+CMEE=2 to enable result code and use verbose values */
+        DEBUG_INFO("Disable AT echo : %s\r\n", (event == GSM_EVENT_OK) ? "[OK]" : "[FAIL]");
+        gsm_hw_send_at_cmd("AT+CMEE=2\r\n", "OK\r\n", "", 1000, 10, gsm_config_module);
+        break;
+
+    case 3:
+        DEBUG_INFO("Set CMEE report: %s\r\n", (event == GSM_EVENT_OK) ? "[OK]" : "[FAIL]");
+        gsm_hw_send_at_cmd("ATI\r\n", "OK\r\n", "", 1000, 10, gsm_config_module);
+        break;
+
+    case 4:
+        DEBUG_INFO("Get module info: %s\r\n", resp_buffer);
+        gsm_hw_send_at_cmd("AT\r\n", "OK\r\n", "", 1000, 10, gsm_config_module);
+        //        gsm_hw_send_at_cmd("AT+QURCCFG=\"URCPORT\",\"uart1\"\r\n", "OK\r\n", "", 1000, 5, gsm_config_module);
+        break;
+
+    case 5:
+        gsm_hw_send_at_cmd("AT+CNMI=2,1,0,0,0\r\n", "", "OK\r\n", 1000, 10, gsm_config_module);
+        break;
+
+    case 6:
+        DEBUG_INFO("Config SMS event report: %s\r\n", (event == GSM_EVENT_OK) ? "[OK]" : "[FAIL]");
+        gsm_hw_send_at_cmd("AT+CMGF=1\r\n", "", "OK\r\n", 1000, 10, gsm_config_module);
+        break;
+
+    case 7:
+        DEBUG_INFO("Set SMS text mode: %s\r\n", (event == GSM_EVENT_OK) ? "[OK]" : "[FAIL]");
+        gsm_hw_send_at_cmd("AT+GSN\r\n", "", "OK\r\n", 1000, 5, gsm_config_module);
+        break;
+
+    case 8:
+    {
+        DEBUG_INFO("CSGN resp: %s, Data %s\r\n", (event == GSM_EVENT_OK) ? "[OK]" : "[FAIL]", (char *)resp_buffer);
+        uint8_t *imei_buffer = (uint8_t *)gsm_get_module_imei();
+        if (strlen((char *)imei_buffer) < 14)
+        {
+            gsm_utilities_get_imei(resp_buffer, (uint8_t *)imei_buffer, 16);
+            DEBUG_INFO("Get GSM IMEI: %s\r\n", imei_buffer);
+            imei_buffer = (uint8_t *)gsm_get_module_imei();
+            if (strlen((char *)imei_buffer) < 15)
+            {
+                DEBUG_INFO("IMEI's invalid!\r\n");
+                gsm_change_state(GSM_STATE_RESET); // We cant get GSM imei, maybe gsm module error =>> Restart module
+                return;
+            }
+        }
+        gsm_hw_send_at_cmd("AT+CFUN=1\r\n", "OK\r\n", "", 1000, 5, gsm_config_module);
+    }
+    break;
+
+    case 9:
+    {
+        gsm_hw_send_at_cmd("AT+CMGF=1\r\n", "OK\r\n", "", 1000, 5, gsm_config_module);
+    }
+    break;
+
+    case 10:
+        gsm_hw_send_at_cmd("AT+CGDCONT=1,\"IP\",\"v-internet\"\r\n", "", "OK\r\n", 1000, 5, gsm_config_module); /** <cid> = 1-24 */
+        break;
+
+    case 11:
+        DEBUG_INFO("Set APN: %s\r\n", (event == GSM_EVENT_OK) ? "[OK]" : "[FAIL]");
+        gsm_hw_send_at_cmd("AT+CGREG=1\r\n", "OK\r\n", "", 1000, 3, gsm_config_module); /** Query CGREG? => +CGREG: <n>,<stat>[,<lac>,<ci>[,<Act>]] */
+    break;
+
+    case 12:
+        DEBUG_INFO("Network registration status: %s, data %s\r\n", (event == GSM_EVENT_OK) ? "[OK]" : "[FAIL]", (char *)resp_buffer);
+        gsm_hw_send_at_cmd("AT+CGREG?\r\n", "OK\r\n", "", 1000, 2, gsm_config_module);
+        break;
+
+    case 13:
+        DEBUG_INFO("Query network status: %s, data %s\r\n", (event == GSM_EVENT_OK) ? "[OK]" : "[FAIL]", (char *)resp_buffer); /** +CGREG: 2,1,"3279","487BD01",7 */
+        gsm_hw_send_at_cmd("AT+COPS?\r\n", "OK\r\n", "", 2000, 2, gsm_config_module);
+        break;
+
+    case 14:
+        DEBUG_INFO("Query network operator: %s\r\n", (event == GSM_EVENT_OK) ? "[OK]" : "[FAIL]"); /** +COPS: 0,0,"Viettel Viettel",7 */
+        if (event == GSM_EVENT_OK)
+        {
+            // Get network operator : Viettel, Vina...
+            gsm_utilities_get_network_operator(resp_buffer,
+                                               gsm_get_network_operator(),
+                                               32);
+            if (strlen(gsm_get_network_operator()) < 5)
+            {
+                gsm_hw_send_at_cmd("AT+COPS?\r\n", "OK\r\n", "", 1000, 3, gsm_config_module);
+                gsm_change_hw_polling_interval(1000);
+                return;
+            }
+            DEBUG_INFO("Network operator: %s\r\n", gsm_get_network_operator());
+        }
+        gsm_change_hw_polling_interval(5);
+        gsm_hw_send_at_cmd("AT\r\n", "OK\r\n", "", 1000, 3, gsm_config_module);
+        break;
+
+    case 15:
+    {
+        //        DEBUG_INFO("Select QSCLK: %s\r\n", (event == GSM_EVENT_OK) ? "[OK]" : "[FAIL]");
+        gsm_hw_send_at_cmd("AT+CCLK?\r\n", "+CCLK:", "OK\r\n", 1000, 5, gsm_config_module);
+    }
+    break;
+
+    case 16:
+    {
+        // Get clock from module
+        DEBUG_INFO("Query CCLK: %s,%s\r\n",
+                   (event == GSM_EVENT_OK) ? "[OK]" : "[FAIL]",
+                   (char *)resp_buffer);
+        // Get 4G signal strength
+        gsm_hw_send_at_cmd("AT+CSQ\r\n", "", "OK\r\n", 1000, 2, gsm_config_module);
+    }
+    break;
+
+    case 17:
+    {
+        if (event != GSM_EVENT_OK)
+        {
+            DEBUG_INFO("GSM: init fail, reset modem...\r\n");
+            m_gsm_manager.step = 0;
+            gsm_change_state(GSM_STATE_RESET);
+            return;
+        }
+
+        uint8_t csq = 99;
+        // Parse signal strength response buffer
+        gsm_utilities_get_signal_strength_from_buffer(resp_buffer, &csq);
+        DEBUG_INFO("CSQ: %d\r\n", csq);
+
+        if (csq == 99) // Invalid CSQ =>> Polling CSQ again
+        {
+            m_gsm_manager.step = 16;
+            gsm_hw_send_at_cmd("AT+CSQ\r\n", "OK\r\n", "", 1000, 3, gsm_config_module);
+            gsm_change_hw_polling_interval(500);
+        }
+        else
+        {
+#if CUSD_ENABLE
+            gsm_change_hw_polling_interval(100);
+            gsm_hw_send_at_cmd("AT+CUSD=1,\"*101#\"\r\n", "+CUSD: ", "\r\n", 10000, 1, gsm_config_module);
+#else
+            gsm_hw_send_at_cmd("AT\r\n", "OK\r\n", "", 2000, 1, gsm_config_module);
+#endif
+        }
+    }
+    break;
+
+    case 18:
+#if CUSD_ENABLE
+        if (event != GSM_EVENT_OK)
+        {
+            DEBUG_INFO("GSM: CUSD query failed\r\n");
+        }
+        else
+        {
+            char *p = strstr((char *)resp_buffer, "+CUSD: ");
+            p += 5;
+            DEBUG_INFO("CUSD %s\r\n", p);
+            //Delayms(5000);
+        }
+#endif
+        // GSM ready, switch to PPP mode
+        gsm_change_hw_polling_interval(5);
+        m_gsm_manager.gsm_ready = 1;
+        m_gsm_manager.step = 0;
+        gsm_hw_send_at_cmd("AT\r\n", "OK\r\n", "", 2000, 1, open_ppp_stack);
+        //            gsm_change_state(GSM_STATE_OK);
+        break;
+
+    default:
+        DEBUG_WARN("GSM unhandled step %u\r\n", m_gsm_manager.step);
+        break;
+    }
+
+    m_gsm_manager.step++;
+}
+
+#endif /* Quectel MC60 */
 
 /*
 * Reset module GSM
@@ -748,7 +943,7 @@ static void ppp_link_status_cb(ppp_pcb *pcb, int err_code, void *ctx)
 
     if (err_code == PPPERR_NONE)
     {
-        DEBUG_INFO("PPP is opened OK\r\n!");
+        DEBUG_INFO("PPP is opened OK\r\n");
         initialize_stnp();
         return;
     }

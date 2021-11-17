@@ -357,7 +357,9 @@ void mqtt_client_polling_task(void *arg)
                     if (err == ERR_INPROGRESS)
                     {
                         /* DNS request sent, wait for sntp_dns_found being called */
-                        DEBUG_INFO("sntp_request: %d - Waiting for server address to be resolved\r\n", err);
+                        DEBUG_INFO("sntp_request: %d - Waiting for server %s address to be resolved\r\n", 
+                                    err,
+                                    m_cfg.broker_addr);
                     }
                     else if (err == ERR_OK)
                     {
@@ -394,12 +396,14 @@ void mqtt_client_polling_task(void *arg)
             tick = now;
 
             if (last_time_send_sub_request == 0 || last_time_send_sub_request > tick)
+            {
                 last_time_send_sub_request = tick;
+            }
 
             if (mqtt_client_is_connected(&m_mqtt_static_client))
             {
                 /* Send subscribe message periodic */
-                if (tick >= (last_time_send_sub_request + m_cfg.periodic_sub_req_s))
+                if (tick >= (last_time_send_sub_request + m_cfg.periodic_sub_req_s*1000))
                 {
                     last_time_send_sub_request = tick;
                     mqtt_client_send_subscribe_req();
