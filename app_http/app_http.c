@@ -137,7 +137,7 @@ static err_t httpc_file_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pb
         struct pbuf *q;
         for (q = p; q; q = q->next)
         {
-            DEBUG_INFO("HTTP data %.*s\r\n", q->len, q->payload); 
+            DEBUG_INFO("HTTP data %.*s\r\n", q->len, q->payload); // in log co the dai qua nen ko in het, cac ban chu y nha
         }
         // MUST used 2 commands!
         tcp_recved(tpcb, p->tot_len);
