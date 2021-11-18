@@ -13,7 +13,7 @@
 #include "sio.h"
 #include "sntp.h"
 
-#define UNLOCK_BAND 1
+#define UNLOCK_BAND 0
 #define CUSD_ENABLE 0
 
 static gsm_manager_t m_gsm_manager;
@@ -93,6 +93,8 @@ void gsm_change_state(gsm_state_t new_state)
     {
         m_gsm_manager.gsm_ready = 2;
     }
+    m_gsm_manager.state = new_state;
+    m_gsm_manager.step = 0;
     DEBUG_INFO("Change GSM state to: ");
     switch ((uint8_t)new_state)
     {
@@ -111,9 +113,15 @@ void gsm_change_state(gsm_state_t new_state)
         DEBUG_RAW("POWERON\r\n");
         gsm_hw_layer_reset_rx_buffer(); // Reset USART RX buffer
         break;
-        //    case GSM_STATE_REOPEN_PPP:
-        //        DEBUG_VERBOSE("REOPENPPP\r\n");
-        //        break;
+    
+    case GSM_STATE_REOPEN_PPP:
+        if (m_gsm_manager.step == 0)
+        {
+                m_gsm_manager.step = 1;
+                m_ppp_connected = false;
+                gsm_hw_send_at_cmd("ATV1\r\n", "OK\r\n", "", 1000, 5, open_ppp_stack);
+        }
+        break;
         //    case GSM_STATE_GET_BTS_INFO:
         //        DEBUG_VERBOSE("GETSIGNAL\r\n");
         //        break;
@@ -123,8 +131,6 @@ void gsm_change_state(gsm_state_t new_state)
     default:
         break;
     }
-    m_gsm_manager.state = new_state;
-    m_gsm_manager.step = 0;
 }
 
 #if UNLOCK_BAND

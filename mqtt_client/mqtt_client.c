@@ -201,7 +201,10 @@ static void mqtt_client_send_heart_beat(void)
 static void mqtt_client_send_subscribe_req(void)
 {
     /* Subscribe to a topic named "qrm/imei/st_data" with QoS level 1, call mqtt_sub_request_cb with result */
-    err_t err = mqtt_subscribe(&m_mqtt_static_client, m_mqtt_subscribe_topic_name, SUB_QoS, mqtt_sub_request_cb, NULL);
+    err_t err = mqtt_subscribe(&m_mqtt_static_client, 
+                                m_mqtt_subscribe_topic_name, 
+                                SUB_QoS, 
+                                mqtt_sub_request_cb, NULL);
 
     DEBUG_INFO("%s: topic %s\r\n", __FUNCTION__, m_mqtt_subscribe_topic_name);
 }
