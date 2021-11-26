@@ -206,7 +206,7 @@ static void mqtt_client_send_subscribe_req(void)
                                 SUB_QoS, 
                                 mqtt_sub_request_cb, NULL);
 
-    DEBUG_INFO("%s: topic %s\r\n", __FUNCTION__, m_mqtt_subscribe_topic_name);
+    DEBUG_INFO("%s: topic %s, error %d\r\n", __FUNCTION__, m_mqtt_subscribe_topic_name, err);
 }
 
 static void heart_beat_msg_tick(void)

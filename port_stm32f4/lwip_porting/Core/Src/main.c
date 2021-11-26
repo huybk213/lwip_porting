@@ -36,7 +36,8 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+#define HTTP_ENABLE	0
+#define MQTT_ENABLE	1
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -113,7 +114,9 @@ int main(void)
     mqtt_client_initialize(&mqtt_cfg);
     
     // Init http parameters
+#if HTTP_ENABLE
     bool m_http_test_started = false;
+#endif
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -124,9 +127,11 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     gsm_mnr_task(NULL);
-#if 1
+#if MQTT_ENABLE
     mqtt_client_polling_task(NULL);
-#else
+#endif
+
+#if HTTP_ENABLE
     if (gsm_data_layer_is_ppp_connected() && m_http_test_started == false)
     {
         m_http_test_started = true;

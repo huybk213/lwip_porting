@@ -23,7 +23,7 @@ int32_t app_debug_rtt(const char *fmt,...)
     int32_t size = SEGGER_RTT_PRINTF_BUFFER_SIZE;
     int32_t time_stamp_size;
 
-    p += sprintf(m_debug_buffer, "<%u>: ", sys_get_tick_ms());
+    p += sprintf(m_debug_buffer, "<%lu>: ", sys_get_tick_ms());
     time_stamp_size = (p-m_debug_buffer);
     size -= time_stamp_size;
     va_list args;

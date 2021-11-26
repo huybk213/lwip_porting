@@ -218,6 +218,7 @@ void USART1_IRQHandler(void)
     {
         DEBUG_PRINTF("GSM UART : Over run\r\n");
         uint32_t tmp = USART1->DR;
+        (void)tmp;
         LL_USART_ClearFlag_ORE(USART1);
     }
     

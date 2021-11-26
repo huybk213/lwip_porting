@@ -122,12 +122,7 @@ void gsm_change_state(gsm_state_t new_state)
                 gsm_hw_send_at_cmd("ATV1\r\n", "OK\r\n", "", 1000, 5, open_ppp_stack);
         }
         break;
-        //    case GSM_STATE_GET_BTS_INFO:
-        //        DEBUG_VERBOSE("GETSIGNAL\r\n");
-        //        break;
-        //    case GSM_STATE_SEND_ATC:
-        //        DEBUG_RAW("Quit PPP and send AT command\r\n");
-        //        break;
+        
     default:
         break;
     }
